@@ -32,7 +32,35 @@ class CategoriesController {
 
   static async getAllCategories(req, res) {
     try {
-    } catch (err) {}
+      //how to get all the data from category
+      //how to get the product data from categories
+      const ambilkategori = await Category.findAll({include: Product})
+      const kategori = ambilkategori.map((kategori)=>{
+        return {
+          id: kategori.id,
+          type: kategori.type,
+          sold_product_amount: kategori.sold_product_amount,
+          createdAt: kategori.createdAt,
+          updatedAt: kategori.updatedAt,
+          Product: {
+            id: kategori.Product.id,
+            title: kategori.Product.title,
+            price: kategori.Product.price,
+            stock: kategori.Product.stock,
+            CategoryId: kategori.Product.CategoryId,
+            createdAt: kategori.Product.createdAt,
+            updatedAt: kategori.Product.updatedAt,
+          },
+        }
+      })
+      if(kategori){
+        return res.status(200).json({
+          category: kategori,
+        })
+      }
+    } catch (err) {
+      res.status(500).json(err)
+    }
   }
 
   static async updateCategories(req, res) {
