@@ -26,7 +26,12 @@ class CategoriesController {
       }
     } catch (err) {
       console.log(err)
-      return res.status(401).json(err)
+      if (err) {
+        return res.status(401).json({
+          name: "Validation Error",
+          message: err.message,
+        })
+      }
     }
   }
 

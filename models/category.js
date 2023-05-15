@@ -17,6 +17,10 @@ module.exports = (sequelize, DataTypes) => {
     {
       type: {
         type: DataTypes.STRING,
+        unique: {
+          args: true,
+          msg: "Type has been used already",
+        },
         allowNull: false,
         validate: {
           notEmpty: {
