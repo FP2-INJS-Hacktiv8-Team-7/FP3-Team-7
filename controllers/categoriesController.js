@@ -35,6 +35,7 @@ class CategoriesController {
       //how to get all the data from category
       //how to get the product data from categories
       const ambilkategori = await Category.findAll({include: Product})
+      //console.log(ambilkategori)
       const kategori = ambilkategori.map((kategori)=>{
         return {
           id: kategori.id,
@@ -70,7 +71,24 @@ class CategoriesController {
 
   static async deleteCategories(req, res) {
     try {
-    } catch (err) {}
+      let CategoryId = req.params.categoryId
+      const hapus = await Category.destroy({
+        where: {
+          id: CategoryId
+        },
+      })
+      if(hapus){
+        return res.status(200).json({
+          message: "Category has been sucessfully deleted"
+        })
+      }else{
+        return res.status(404).json({
+          message: `Category with id ${CategoryId} does not exist`
+        })
+      }
+    } catch (err) {
+      return res.status(500).json(err)
+    }
   }
 }
 
