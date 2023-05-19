@@ -35,7 +35,6 @@ class CategoriesController {
       //how to get all the data from category
       //how to get the product data from categories
       const ambilkategori = await Category.findAll({include: Product})
-      //console.log(ambilkategori)
       const kategori = ambilkategori.map((kategori)=>{
         return {
           id: kategori.id,
@@ -43,14 +42,14 @@ class CategoriesController {
           sold_product_amount: kategori.sold_product_amount,
           createdAt: kategori.createdAt,
           updatedAt: kategori.updatedAt,
-          Product: {
-            id: kategori.Product.id,
-            title: kategori.Product.title,
-            price: kategori.Product.price,
-            stock: kategori.Product.stock,
-            CategoryId: kategori.Product.CategoryId,
-            createdAt: kategori.Product.createdAt,
-            updatedAt: kategori.Product.updatedAt,
+          Products: {
+            id: kategori.Products.id,
+            title: kategori.Products.title,
+            price: kategori.Products.price,
+            stock: kategori.Products.stock,
+            CategoryId: kategori.Products.CategoryId,
+            createdAt: kategori.Products.createdAt,
+            updatedAt: kategori.Products.updatedAt,
           },
         }
       })
