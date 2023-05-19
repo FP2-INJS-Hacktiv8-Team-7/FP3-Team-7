@@ -6,7 +6,6 @@ class CategoriesController {
     try {
       let sold_product_amount
       const UserId = res.locals.user.id
-      console.log(UserId)
       const category = await Category.create({
         type,
         sold_product_amount,
@@ -26,72 +25,69 @@ class CategoriesController {
       }
     } catch (err) {
       console.log(err)
-      if (err) {
-        return res.status(401).json({
-          name: "Validation Error",
-          message: err.message,
-        })
-      }
+      return res.status(401).json(err)
     }
   }
 
   static async getAllCategories(req, res) {
     try {
-      //how to get all the data from category
-      //how to get the product data from categories
-      const ambilkategori = await Category.findAll({include: Product})
-      const kategori = ambilkategori.map((kategori)=>{
-        return {
-          id: kategori.id,
-          type: kategori.type,
-          sold_product_amount: kategori.sold_product_amount,
-          createdAt: kategori.createdAt,
-          updatedAt: kategori.updatedAt,
-          Products: {
-            id: kategori.Products.id,
-            title: kategori.Products.title,
-            price: kategori.Products.price,
-            stock: kategori.Products.stock,
-            CategoryId: kategori.Products.CategoryId,
-            createdAt: kategori.Products.createdAt,
-            updatedAt: kategori.Products.updatedAt,
-          },
-        }
-      })
-      if(kategori){
-        return res.status(200).json({
-          category: kategori,
-        })
+      const categories = await Category.findAll({ include: Product })
+      if (categories) {
+        res.status(200).json({ categories })
       }
     } catch (err) {
-      res.status(500).json(err)
+      console.log(err)
+      return res.status(401).json(err)
     }
   }
 
   static async updateCategories(req, res) {
     try {
-    } catch (err) {}
+      const { type } = req.body
+      const categoriesId = req.params.id
+
+      const updatedCategories = await Category.update(
+        { type },
+        {
+          where: {
+            id: categoriesId,
+          },
+          returning: true,
+        }
+      )
+      if (updatedCategories) {
+        console.log(updatedCategories)
+        return res.status(200).json({
+          category: {
+            id: updatedCategories[1][0].id,
+            type: updatedCategories[1][0].type,
+            sold_product_amount: updatedCategories[1][0].sold_product_amount,
+            createdAt: updatedCategories[1][0].createdAt,
+            updatedAt: updatedCategories[1][0].updatedAt,
+          },
+        })
+      }
+    } catch (err) {
+      console.log(err)
+      return res.status(401).json(err)
+    }
   }
 
   static async deleteCategories(req, res) {
     try {
-      let CategoryId = req.params.categoryId
-      const hapus = await Category.destroy({
-        where: {
-          id: CategoryId
-        },
+      const categoriesId = req.params.id
+      const deletedCategories = await Category.destroy({
+        where: { id: categoriesId },
       })
-      if(hapus){
+
+      if (deletedCategories) {
         return res.status(200).json({
-          message: "Category has been sucessfully deleted"
-        })
-      }else{
-        return res.status(404).json({
-          message: `Category with id ${CategoryId} does not exist`
+          message: "Category has been successfully deleted",
         })
       }
     } catch (err) {
-      return res.status(500).json(err)
+      console.log(err)
+      return res.status(401).json(err)
     }
   }
 }
