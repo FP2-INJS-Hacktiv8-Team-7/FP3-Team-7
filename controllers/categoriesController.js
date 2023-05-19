@@ -37,7 +37,35 @@ class CategoriesController {
 
   static async getAllCategories(req, res) {
     try {
-    } catch (err) {}
+      //how to get all the data from category
+      //how to get the product data from categories
+      const ambilkategori = await Category.findAll({include: Product})
+      const kategori = ambilkategori.map((kategori)=>{
+        return {
+          id: kategori.id,
+          type: kategori.type,
+          sold_product_amount: kategori.sold_product_amount,
+          createdAt: kategori.createdAt,
+          updatedAt: kategori.updatedAt,
+          Products: {
+            id: kategori.Products.id,
+            title: kategori.Products.title,
+            price: kategori.Products.price,
+            stock: kategori.Products.stock,
+            CategoryId: kategori.Products.CategoryId,
+            createdAt: kategori.Products.createdAt,
+            updatedAt: kategori.Products.updatedAt,
+          },
+        }
+      })
+      if(kategori){
+        return res.status(200).json({
+          category: kategori,
+        })
+      }
+    } catch (err) {
+      res.status(500).json(err)
+    }
   }
 
   static async updateCategories(req, res) {
@@ -47,7 +75,24 @@ class CategoriesController {
 
   static async deleteCategories(req, res) {
     try {
-    } catch (err) {}
+      let CategoryId = req.params.categoryId
+      const hapus = await Category.destroy({
+        where: {
+          id: CategoryId
+        },
+      })
+      if(hapus){
+        return res.status(200).json({
+          message: "Category has been sucessfully deleted"
+        })
+      }else{
+        return res.status(404).json({
+          message: `Category with id ${CategoryId} does not exist`
+        })
+      }
+    } catch (err) {
+      return res.status(500).json(err)
+    }
   }
 }
 
