@@ -12,11 +12,11 @@ const authorization = require("../middlewares/authorization")
 
 app.use(authentication)
 app.get("/", getAllProducts)
+app.use(authorization)
 app.use("/:id", authorization)
 app.put("/:id", updateProduct)
 app.patch("/:id", updateProductCategory)
 app.delete("/:id", deleteProduct)
-app.use(authorization)
 app.post("/", createProduct)
 
 module.exports = app
