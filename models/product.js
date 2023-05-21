@@ -1,5 +1,7 @@
 "use strict"
 const { Model } = require("sequelize")
+const currencyFormatter = require("currency-formatter")
+
 module.exports = (sequelize, DataTypes) => {
   class Product extends Model {
     /**
@@ -31,6 +33,15 @@ module.exports = (sequelize, DataTypes) => {
       },
       price: {
         type: DataTypes.INTEGER,
+        //get() ini isinya agar hasil querynya udah diconvert ke IDR dlu sebelum di return ke controller
+        //tp bikin urutannya jd price dlu baru id
+        get() {
+          const rawValue = this.getDataValue('price');
+          let convertBalancetoIDR = currencyFormatter.format(rawValue, {
+            code: "IDR",
+          })
+          return convertBalancetoIDR;
+        },
         allowNull: false,
         validate: {
           notEmpty: {
