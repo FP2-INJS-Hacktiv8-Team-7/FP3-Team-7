@@ -1,72 +1,99 @@
-const { Product } = require("../models")
+const { Product, Category } = require("../models")
 const currencyFormatter = require("currency-formatter")
 
 class ProductsController {
   static async createProduct(req, res) {
     try {
-      const {
+      const { title, price, stock, CategoryId } = req.body
+      let data = {
         title,
         price,
         stock,
-        CategoryId
-      } = req.body
-      console.log(req.body);
-      const data = {
-        title,
-        price,
-        stock,
-        CategoryId
+        CategoryId,
       }
-      const newProduct = await Product.create(data, {
-        returning: true,
+      const checkCategoryId = await Category.findOne({
+        where: { id: CategoryId },
       })
-      return res.status(201).json(newProduct)
-
+      if (checkCategoryId) {
+        const product = await Product.create(data)
+        if (product) {
+          product.price = currencyFormatter.format(product.price, {
+            code: "IDR",
+          })
+          return res.status(201).json({
+            product,
+          })
+        }
+      } else {
+        return res.status(401).json({
+          name: "Failed",
+          devMessage: "CategoryId does not exist",
+        })
+      }
     } catch (err) {
-      res.status(401).json(err)
       console.log(err)
+      return res.status(401).json(err)
     }
   }
 
   static async getAllProducts(req, res) {
     try {
-      let products = await Product.findAll()
-      //products.price = currencyFormatter.format(products.price, {
-      //  code: "IDR",
-      //})
+      const products = await Product.findAll()
+      const eachProduct = products.map((product) => {
+        product.price = currencyFormatter.format(product.price, {
+          code: "IDR",
+        })
+
+        return {
+          id: product.id,
+          title: product.title,
+          price: product.price,
+          stock: product.stock,
+          CategoryId: product.CategoryId,
+          createdAt: product.createdAt,
+          updateAt: product.updatedAt,
+        }
+      })
+
       if (products) {
-        res.status(200).json({ products })
+        return res.status(200).json({
+          products: eachProduct,
+        })
       }
     } catch (err) {
-      res.status(401).json(err)
       console.log(err)
+      return res.status(401).json(err)
     }
   }
 
   static async updateProduct(req, res) {
     try {
-      const {
-        title,
-        stock,
-        price
-      } = req.body
-      const productid = req.params.id
-      console.log(req.body);
-      console.log(req.params.id);
-      const data = {
-        title,
-        price,
-        stock
+      const productId = req.params.id
+      const { price, stock, title } = req.body
+      const product = await Product.update(
+        { price, stock, title },
+        {
+          where: {
+            id: productId,
+          },
+          returning: true,
+        }
+      )
+
+      if (product[0] === 1) {
+        product[1][0].price = currencyFormatter.format(product[1][0].price, {
+          code: "IDR",
+        })
+
+        return res.status(200).json({
+          product: product[1],
+        })
+      } else {
+        return res.status(401).json({
+          name: "Failed",
+          devMessage: `Product with id ${productId} does not exist!`,
+        })
       }
-      const newProduct = await Product.update(data, {
-        where: {
-          id: productid,
-        },
-        returning: true,
-      })
-      return res.status(201).json({
-        product: newProduct[1][0]
-      })
     } catch (err) {
       console.log(err)
       return res.status(401).json(err)
@@ -75,24 +102,28 @@ class ProductsController {
 
   static async updateProductCategory(req, res) {
     try {
-      const {
-        CategoryId
-      } = req.body
-      const productid = req.params.id
-      console.log(req.body);
-      console.log(req.params.id);
-      const data = {
-        CategoryId
-      }
-      const newProduct = await Product.update(data, {
+      const { CategoryId } = req.body
+      const productId = req.params.id
+      const categoryIdCheck = await Category.findOne({
         where: {
-          id: productid,
+          id: CategoryId,
         },
-        returning: true,
       })
-      return res.status(201).json({
-        product: newProduct[1][0]
-      })
+
+      if (categoryIdCheck) {
+        const product = await Product.update(
+          { CategoryId },
+          { where: { id: productId }, returning: true }
+        )
+        if (product) {
+          return res.status(200).json({ product: product[1] })
+        }
+      } else {
+        return res.status(401).json({
+          name: "Failed",
+          message: `CategoryId ${CategoryId} did not exist!`,
+        })
+      }
     } catch (err) {
       console.log(err)
       return res.status(401).json(err)
@@ -102,13 +133,15 @@ class ProductsController {
   static async deleteProduct(req, res) {
     try {
       const productId = req.params.id
-      const isdeleted = await Product.destroy({
-        where: { id: productId },
-      })
-
-      if (isdeleted) {
+      const deletedProduct = await Product.destroy({ where: { id: productId } })
+      if (deletedProduct) {
         return res.status(200).json({
           message: "Product has been successfully deleted",
+        })
+      } else {
+        return res.status(401).json({
+          name: "Failed",
+          devMessage: `Product with id ${productId} did not exist!`,
         })
       }
     } catch (err) {

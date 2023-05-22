@@ -7,7 +7,7 @@ const transactionHistoriesRoutes = require("./transactionHistoriesRoutes")
 router.use("/users", userRoutes)
 router.use("/categories", categoriesRoutes)
 router.use("/products", productsRoutes)
-// router.use("/transactions", transactionHistoriesRoutes)
+router.use("/transactions", transactionHistoriesRoutes)
 router.use("*", (req, res) => {
   return res.status(400).json({
     code: 400,
