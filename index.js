@@ -3,6 +3,7 @@ const app = express()
 const router = require("./routers")
 const PORT = process.env.PORT
 const { sequelize } = require("./models")
+const seederFiles = require("./seeders/20230511053435-seeding_user_admin_data")
 
 const helmet = require("helmet")
 
