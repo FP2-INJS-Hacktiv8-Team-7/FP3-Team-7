@@ -7,4 +7,4 @@ How to Run :
 3. npx sequelize-cli db:migrate
 4. npx sequelize-cli db:seed:all
 
-Link Railway : fp3-team-7-production.up.railway.app
+Link Railway :

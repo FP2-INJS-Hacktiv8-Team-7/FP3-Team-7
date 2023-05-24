@@ -79,14 +79,12 @@ class ProductsController {
           returning: true,
         }
       )
-
       if (product[0] === 1) {
         product[1][0].price = currencyFormatter.format(product[1][0].price, {
           code: "IDR",
         })
-
         return res.status(200).json({
-          product: product[1],
+          product: product[1][0],
         })
       } else {
         return res.status(401).json({
@@ -116,7 +114,7 @@ class ProductsController {
           { where: { id: productId }, returning: true }
         )
         if (product) {
-          return res.status(200).json({ product: product[1] })
+          return res.status(200).json({ product: product[1][0] })
         }
       } else {
         return res.status(401).json({

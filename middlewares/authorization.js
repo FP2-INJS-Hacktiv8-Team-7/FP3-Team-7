@@ -4,7 +4,6 @@ function authorization(req, res, next) {
   const userRole = res.locals.user.role
   const url = req.baseUrl
   const id = req.params.id
-  // console.log(url)
 
   if (url === `/categories/${id}` || url === "/categories") {
     if (url === "/categories") {
@@ -83,7 +82,6 @@ function authorization(req, res, next) {
   } else if (url === `/transactions/${id}` || url === "/transactions/admin") {
     const UserId = res.locals.user.id
     const fullName = res.locals.user.full_name
-    // console.log(url)
 
     if (url === `/transactions/${id}`) {
       TransactionHistory.findOne({ where: { id } })
@@ -121,8 +119,6 @@ function authorization(req, res, next) {
       return next()
     }
   } else {
-    console.log(userRole)
-    console.log(url)
     return res.status(400).json({
       code: "400",
       message: "Not Found",
